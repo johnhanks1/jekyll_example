@@ -10,7 +10,11 @@ Assume customer has a working Jenkins server.
 Create a new repository
 
 `git clone https://github.com/jekyll/example`
+
+`cd example`
+
 `git remote set-url origin https://github.com/#{github-repo-name}`
+
 `git push`
 
 Now we will add a couple of files that will be used with CodeBuild and Jenkins
@@ -28,40 +32,16 @@ phases:
       commands:
         - echo "******** Building Jekyll site ********"
         - jekyll build
-     post_build:
-       commands:
-         - echo "******** Uploading to S3 ********"
-         - aws s3 sync _site/ s3://jenkinspipelineexample
 artifacts:
  files: _site/*
 ```
-
-Please fill in attributes and save values for use later in the demo
-Jenkinsfile
-//TODO add CodeDeploy steps to Jenkinsfile
-```
-pipeline {
-  agent any
-    stages {
-      stage('Build') {
-        steps {
-          awsCodeBuild projectName: '#{project-name}',
-                       credentialsId: '#{credential-id}',
-                       credentialsType: 'jenkins',
-                       region: '#{region}',
-                       sourceControlType: 'jenkins'
-
-        }
-      }
-    }
-}
-```
-
 ## Setup CodeBuild Resources
 Create a bucket for our CodeBuild Artifacts to be publish to:
 
-`aws s3api create-bucket --bucket jekyll-example-artifacts-#{account-id}-#{region} --region #{region} `
+`aws s3api create-bucket --bucket jekyll-example-artifacts-#{account-id}-#{region} --region #{region}  --create-bucket-configuration LocationConstraint=#{region}`
+
 //Add cloudformation template but for now console setup
+
 Login to AWSConsole and navigate to:
 https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=#{region}
 1. Set Project Name to #{project-name}
@@ -89,6 +69,36 @@ Install CodeBuild and CodeDeploy plugins on jenkins server.
 6. Click Download now and install after restart
 
 
+### Setup Jenkins pipeline resources 
+
+//TODO create IAM role to use to call CodeBuild From jenkins set this up in CFN
+
+Please fill in attributes and save values for use later in the demo
+
+Jenkinsfile
+
+Make sure to replace values with noted values from above
+
+```
+pipeline {
+  agent any
+    stages {
+      stage('Build') {
+        steps {
+          awsCodeBuild projectName: '#{project-name}',
+                       credentialsId: '#{credential-id}',
+                       credentialsType: 'jenkins',
+                       region: '#{region}',
+                       sourceControlType: 'project'
+
+        }
+      }
+    }
+}
+```
+
+
+
 ### Create Jenkins Pipeline
 1. Click New Item 
 2. Set name to CodeBuildJekyllExample
@@ -102,3 +112,4 @@ Install CodeBuild and CodeDeploy plugins on jenkins server.
   * Click SCM select Git
   * Enter Repository URL
   * Click Save
+
