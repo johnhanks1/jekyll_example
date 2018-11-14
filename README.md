@@ -9,7 +9,7 @@ Assume customer has a working Jenkins server.
 ## Setup Github repo
 Create a new repository
 
-`git clone https://github.com/jekyll/jekyll`
+`git clone https://github.com/johnhanks1/jekyll_example`
 
 `cd example`
 
@@ -35,8 +35,8 @@ phases:
       - echo "******** Building Jekyll site ********"
       - jekyll build
 artifacts:
- files: _site/*
- discard-paths: yes
+ files: "**/*"
+ base-directory: _site
 ```
 ## Setup CodeBuild Resources
 Create a bucket for our CodeBuild Artifacts to be publish to:
@@ -181,4 +181,14 @@ pipeline {
   * Enter **Repository URL**
   * Click **Save**
 7. Now wait up to 1 minute and a build should be kicked off.
+8. Make sure build succeeded
+9. Check S3 Bucket website and see the newly created blog
 
+
+### Update Blog
+We will now create a new post that will get automatically built.
+1. Open **_posts/2018-11-14-welcome-to-jekyll.markdown**
+2. Edit the posts Title and contents
+3. Commit and push changes to repository
+4. Watch for build to automatically be triggered by Jenkins
+5. Once build is complete look at the S3 website to see the update
