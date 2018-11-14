@@ -13,9 +13,11 @@ Create a new repository
 
 `cd example`
 
+`git checkout -b master`
+
 `git remote set-url origin https://github.com/#{github-repo-name}`
 
-`git push`
+`git push --set-upstream origin master`
 
 Now we will add a couple of files that will be used with CodeBuild and Jenkins
 
@@ -70,10 +72,34 @@ Install CodeBuild and CodeDeploy plugins on jenkins server.
 
 
 ### Setup Jenkins pipeline resources 
+Create an IAM user that can call CodeBuild
+1. Navigate to https://console.aws.amazon.com/iam/home?region=#{region}#/home
+2. Select **Users**
+3. Click **Add user**
+4. Add *name* and select **Programmatic access** check box
+5. Click **Next: Permissions**
+6. Click **Attach Existing Policies directly**
+  1. Search for **AWSCodeBuildAdminAccess**
+  2. Click check box
+7. Click **Next: Review**
+8. Click **Create User**
+9. Note Access Key Id and Secret Access Key 
 
-//TODO create IAM role to use to call CodeBuild From jenkins set this up in CFN
+### Add user to Jenkins
 
-Please fill in attributes and save values for use later in the demo
+1. Navigate To Jenkins main menu
+2. Click **Credentials**
+3. Click **System**
+4. Click **Global credentials**
+5. Click **Add Credentials**
+6. Click **Kind** and select **CodeBuild Credentials**
+7. Enter **ID** and note the id
+8. Add AccessKey and Secret Access Key from above leaving all other areas blank.
+9. Click **OK**
+
+
+We now need to add a Jenkinsfile to our repository. This will have the information that
+jenkins will need to call CodeBuild.
 
 Jenkinsfile
 
@@ -97,6 +123,12 @@ pipeline {
 }
 ```
 
+### Push Changes into repo
+`git add buildspec.yml`
+
+`git add Jenkinsfile`
+
+`git push`
 
 
 ### Create Jenkins Pipeline
