@@ -9,7 +9,7 @@ Assume customer has a working Jenkins server.
 ## Setup Github repo
 Create a new repository
 
-`git clone https://github.com/jekyll/example`
+`git clone https://github.com/jekyll/jekyll`
 
 `cd example`
 
@@ -23,52 +23,88 @@ Now we will add a couple of files that will be used with CodeBuild and Jenkins
 
 buildspec.yml
 ```
-version: 2.0
+version: 0.2
 
 phases:
   install:
     commands:
       - gem install jekyll jekyll-paginate jekyll-sitemap jekyll-gist
       - bundle install
-    build:
-      commands:
-        - echo "******** Building Jekyll site ********"
-        - jekyll build
+  build:
+    commands:
+      - echo "******** Building Jekyll site ********"
+      - jekyll build
 artifacts:
  files: _site/*
+ discard-paths: yes
 ```
 ## Setup CodeBuild Resources
 Create a bucket for our CodeBuild Artifacts to be publish to:
 
-`aws s3api create-bucket --bucket jekyll-example-artifacts-#{account-id}-#{region} --region #{region}  --create-bucket-configuration LocationConstraint=#{region}`
+1. Navigate to https://s3.console.aws.amazon.com/s3/home?region=#{region}
+2. Click **Create Bucket**
+3. Enter Bucket name
+4. Click **Next**
+5. Select Versioning
+6. **Click Next**
+7. Click **Next**
+8. Click Create Bucket
+10. Select **Bucket From list**
+11. Select **Properties Tab**
+12. Select Static website Hosting
+13. Select **Use this Bucket to host a website**
+14. Add **index.html** to **Index Document**
+15. Add **404.html** to **Error Document**
+16. Note the endpoint
+16. Click **Save**
 
-//Add cloudformation template but for now console setup
+Add Public Read to bucket 
+1. Click **Permissions**
+2. Click **Bucket Policy**
+3. Paste policy below make sure to replace bucket name
+
+```
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::#{bucket-name}/*"
+        }
+    ]
+}
+```
+
+`aws s3api create-bucket --bucket jekyll-example-artifacts-#{account-id}-#{region} --region #{region}  --create-bucket-configuration LocationConstraint=#{region}`
 
 Login to AWSConsole and navigate to:
 https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=#{region}
-1. Set Project Name to #{project-name}
-2. Select GitHub
-3. Follow OAuth flow to connect your GitHub account to CodeBuild
-4. Select public repository created above.
-5. Navigate to environment select Ubuntu -> Ruby -> aws/codebuild/ruby:2.5.1
-6. Enter a role name or choose and existing role in your account
-7. Navigate to Artifacts 
-  1. Select S3 as an artifact
+1. Set **Project Name** to #{project-name}
+2. Navigate to Source section
+  1. Select **GitHub**
+  2. Follow OAuth flow to connect your GitHub account to CodeBuild
+3. Select the repository created above.
+4. Navigate to environment select **Ubuntu -> Ruby -> aws/codebuild/ruby:2.5.1**
+5. Navigate to **Artifacts**
+  1. Select **Amazon S3** as an artifact type
   2. Choose the bucket we created above: jekyll-example-artifacts-#{account-id}-#{region}
-  3. //TODO maybe set artifacts packaging type to zip to use with CodeDeploy.
+  3. Click Checkbox **Remove Artifact Encryption**
+6. Click **Create build Project**
 
 ## Setup Jenkins
 Install CodeBuild and CodeDeploy plugins on jenkins server.
-1. Navigate in Jenkins Manage Jenkins -> Manage Plugins -> Available Tab
-2. Search for AWS CodeDeploy
-  * Click Install Checkbox
-3. Search AWS CodeBuild
-  * Click Install Checkbox
-4. Search GitHub
-  * Click Install Checkbox
-5. Search Blue Ocean
-  * Click Install Checkbox
-6. Click Download now and install after restart
+1. Navigate in Jenkins to **Manage Jenkins -> Manage Plugins -> Available Tab**
+2. Search for **AWS CodeDeploy**
+  * Click **Install Checkbox**
+3. Search **AWS CodeBuild**
+  * Click **Install Checkbox**
+4. Search **GitHub**
+  * Click **Install Checkbox**
+5. Search **Blue Ocean**
+  * Click **Install Checkbox**
+6. Click **Download now and install after restart**
 
 
 ### Setup Jenkins pipeline resources 
@@ -133,15 +169,16 @@ pipeline {
 
 ### Create Jenkins Pipeline
 1. Click New Item 
-2. Set name to CodeBuildJekyllExample
-3. Select Pipeline
-4. Click OK
-5. Navigate to Build Triggers
-  * Click Poll SCM
+2. Set **Name **
+3. Select **Pipeline**
+4. Click **OK**
+5. Navigate to **Build Triggers**
+  * Click **Poll SCM**
   * Enter "* * * * *" this will pull github every minute for changes
-6. Navigate to Pipeline
-  * Click Definition and select Pipeline Script from SCM
-  * Click SCM select Git
-  * Enter Repository URL
-  * Click Save
+6. Navigate to **Pipeline**
+  * Click Definition and select **Pipeline Script from SCM**
+  * Click **SCM** select **Git**
+  * Enter **Repository URL**
+  * Click **Save**
+7. Now wait up to 1 minute and a build should be kicked off.
 
