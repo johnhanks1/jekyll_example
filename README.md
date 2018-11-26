@@ -1,4 +1,8 @@
 # Setup CodeBuild and CodeDeploy with Jenkins
+### Prerequisites
+* You have an AWSAccount
+* You have a Jenkins server setup.
+  * If you don't have a Jenkins server running follow these [instructions](https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf).
 
 Replace vaules in walk through with customer values
 * #{region} -> region you would like to create resources in
