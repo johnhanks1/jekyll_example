@@ -11,11 +11,15 @@ Create a new repository
 
 `git clone https://github.com/johnhanks1/jekyll_example`
 
-`cd example`
+`cd jekyll_example`
 
 `git checkout -b master`
 
 `git remote set-url origin https://github.com/#{github-repo-name}`
+
+or if using ssh for auth
+
+`git remote set-url origin git@github.com:#{github-repo-name}`
 
 `git push --set-upstream origin master`
 
@@ -46,17 +50,19 @@ Create a bucket for our CodeBuild Artifacts to be publish to:
 3. Enter Bucket name
 4. Click **Next**
 5. Select Versioning
-6. **Click Next**
-7. Click **Next**
-8. Click Create Bucket
-10. Select **Bucket From list**
-11. Select **Properties Tab**
-12. Select Static website Hosting
-13. Select **Use this Bucket to host a website**
-14. Add **index.html** to **Index Document**
-15. Add **404.html** to **Error Document**
-16. Note the endpoint
-16. Click **Save**
+6. Click **Next**
+7. uncheck the checkbox next to **Block new public bucket policies (Recommended)**
+8. uncheck the checkbox next to **Block public and cross-account access if bucket has public policies (Recommended)**
+9. Click **Next**
+10. Click **Create Bucket**
+11. Select **Bucket From list**
+12. Select **Properties Tab**
+13. Select Static website Hosting
+14. Select **Use this Bucket to host a website**
+15. Add **index.html** to **Index Document**
+16. Add **404.html** to **Error Document**
+17. Note the endpoint
+18. Click **Save**
 
 Add Public Read to bucket 
 1. Click **Permissions**
@@ -77,8 +83,6 @@ Add Public Read to bucket
 }
 ```
 
-`aws s3api create-bucket --bucket jekyll-example-artifacts-#{account-id}-#{region} --region #{region}  --create-bucket-configuration LocationConstraint=#{region}`
-
 Login to AWSConsole and navigate to:
 https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=#{region}
 1. Set **Project Name** to #{project-name}
@@ -90,7 +94,8 @@ https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=
 5. Navigate to **Artifacts**
   1. Select **Amazon S3** as an artifact type
   2. Choose the bucket we created above: jekyll-example-artifacts-#{account-id}-#{region}
-  3. Click Checkbox **Remove Artifact Encryption**
+  3. In the **Path** text box enter a **.**
+  4. Click Checkbox **Remove Artifact Encryption**
 6. Click **Create build Project**
 
 ## Setup Jenkins
@@ -169,7 +174,7 @@ pipeline {
 
 ### Create Jenkins Pipeline
 1. Click New Item 
-2. Set **Name **
+2. Set **Name**
 3. Select **Pipeline**
 4. Click **OK**
 5. Navigate to **Build Triggers**
