@@ -1,8 +1,27 @@
 # Setup CodeBuild with Jenkins
 ### Prerequisites
 * You have an AWSAccount
-* You have a Jenkins server setup.
-  * If you don't have a Jenkins server running follow these [instructions](https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf).
+
+#### Spin up a Jenkins Server in that account
+1. Navigate to IAM Console
+2. Click **Role**
+3. Click **Create Role**
+4. Choose **EC2** as the service that will use your role
+5. Click **Next:Permissions**
+6. Give the role **AWSCodeBuildAdminAccess**, **AmazonS3FullAccess**, and **CloudWatchLogsFullAccess** 
+7. Click **Next:Tags**
+8. Click **Next:Review** 
+9. Name role **CodeBuildDemo**
+10. Click **Create Role**
+
+Create Jenkins Server:
+1. Navigate to CloudFormation Console
+2. Click **Create Stack**
+3. Click **Specify an Amazon S3 template URL** and use `https://s3.amazonaws.com/proberts-public/jenkins_build.yaml`
+4. Fill in each value for the template and create the stack.
+5. You will receive the password to login to your jenkins host on your phone.
+6. Navigate to EC2 and find the instance name Jenkins public DNS
+7. Connect to the dns at port 8080
 
 Replace values in walk through with customer values
 * #{region} -> region you would like to create resources in
@@ -101,20 +120,6 @@ https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=
   3. In the **Path** text box enter a **.**
   4. Click Checkbox **Remove Artifact Encryption**
 6. Click **Create build Project**
-
-## Setup Jenkins
-Install CodeBuild and CodeDeploy plugins on jenkins server.
-1. Navigate in Jenkins to **Manage Jenkins -> Manage Plugins -> Available Tab**
-2. Search for **AWS CodeDeploy**
-  * Click **Install Checkbox**
-3. Search **AWS CodeBuild**
-  * Click **Install Checkbox**
-4. Search **GitHub**
-  * Click **Install Checkbox**
-5. Search **Blue Ocean**
-  * Click **Install Checkbox**
-6. Click **Download now and install after restart**
-
 
 ### Setup Jenkins pipeline resources 
 Create an IAM user that can call CodeBuild
