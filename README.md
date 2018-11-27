@@ -1,40 +1,27 @@
 # Setup CodeBuild with Jenkins
 ### Prerequisites
-* You have an AWSAccount
+* You can run Docker containers locally
+* You have an AWSAccount in which you can create:
+    * IAM users
+    * CodeBuild project
+    * S3 bucket
 
-#### Spin up a Jenkins Server in that account
-1. Navigate to IAM Console
-2. Click **Role**
-3. Click **Create Role**
-4. Choose **EC2** as the service that will use your role
-5. Click **Next:Permissions**
-6. Give the role **AWSCodeBuildAdminAccess**, **AmazonS3FullAccess**, and **CloudWatchLogsFullAccess** 
-7. Click **Next:Tags**
-8. Click **Next:Review** 
-9. Name role **CodeBuildDemo**
-10. Click **Create Role**
+#### Spin up a local Jenkins Server
+1. Run `docker run --rm -it -p 8080:8080 --name jenkins jenkins/jenkins:lts`
+2. Note the password that is in the output
+3. Open your browser and go to http://localhost:8080/
+4. Enter the password that you noted
+5. Click **Select plugins to install**
+6. Click **None**
+7. Select **Pipeline**, **GitHub**
+8. Create your user
+9. Click **Manage Jenkins**
+10. Click **Manage Plugins**
+11. Click **Available**
+12. Select **AWS CodeBuild**
+13. Click **Install without restart**
 
-Create a KeyPair
-
-1. Navigate to EC2 console
-2. Click **Key Pair** on the left
-3. Click **Create Key Pair**
-4. Save Keypair on desktop
-
-Create Jenkins Server
-
-1. Navigate to CloudFormation Console
-2. Click **Create Stack**
-3. Click **Specify an Amazon S3 template URL** and use `https://s3.amazonaws.com/proberts-public/jenkins_build.yaml`
-4. Set **Stack Name**
-5. Set **SSHKey** to keypair from above
-6. Set **Subnet** to a public subnet
-7. Set **VPC** to a vpc that is part of that subnet
-9. Navigate to EC2 and find the instance name Jenkins public DNS
-10. Connect to the dns at port 8080
-11. SSH onto jenkins box to get the password
-
-
+Assume customer has a working Jenkins server.
 ## Setup Github repo
 **Create a new repository in your github account**
 
@@ -74,7 +61,7 @@ artifacts:
 ## Setup CodeBuild Resources
 Create a bucket for our CodeBuild Artifacts to be publish to:
 
-1. Navigate to https://s3.console.aws.amazon.com/s3/home?region=#{region}
+1. Navigate to https://s3.console.aws.amazon.com/s3/home
 2. Click **Create Bucket**
 3. Enter Bucket name
 4. Click **Next**
@@ -113,7 +100,7 @@ Add Public Read to bucket
 ```
 
 Login to AWSConsole and navigate to:
-https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=#{region}
+https://console.aws.amazon.com/codesuite/codebuild/project/new
 1. Set **Project Name** to #{project-name}
 2. Navigate to Source section
   1. Select **GitHub**
@@ -123,13 +110,13 @@ https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=
 5. Navigate to **Artifacts**
   1. Select **Amazon S3** as an artifact type
   2. Choose the bucket we created above: jekyll-example-artifacts-#{account-id}-#{region}
-  3. In the **Name** text box enter a **.**
+  3. In the **Path** text box enter a **.**
   4. Click Checkbox **Remove Artifact Encryption**
 6. Click **Create build Project**
 
 ### Setup Jenkins pipeline resources 
 Create an IAM user that can call CodeBuild
-1. Navigate to https://console.aws.amazon.com/iam/home?region=#{region}#/home
+1. Navigate to https://console.aws.amazon.com/iam/home
 2. Select **Users**
 3. Click **Add user**
 4. Add *name* and select **Programmatic access** check box
