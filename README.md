@@ -214,3 +214,11 @@ We will now create a new post that will get automatically built.
 3. Commit and push changes to repository
 4. Watch for build to automatically be triggered by Jenkins
 5. Once build is complete look at the S3 website to see the update
+
+### Clean Up
+We want to make sure to clear up these resources so that our aws account doesn't rack up charges.
+
+* Terminate Ec2 Host
+* Delete S3 Bucket
+* Delete User and Role
+* Delete CodeBuild Project
