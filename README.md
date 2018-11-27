@@ -36,7 +36,7 @@ Create Jenkins Server
 
 
 ## Setup Github repo
-Create a new repository
+**Create a new repository in your github account**
 
 `git clone https://github.com/johnhanks1/jekyll_example`
 
