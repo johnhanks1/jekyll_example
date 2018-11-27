@@ -184,6 +184,8 @@ pipeline {
 
 `git add Jenkinsfile`
 
+`git commit -am "Adding Jenkinsfile and buildspec`
+
 `git push`
 
 
