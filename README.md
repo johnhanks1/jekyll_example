@@ -14,21 +14,27 @@
 9. Name role **CodeBuildDemo**
 10. Click **Create Role**
 
-Create Jenkins Server:
+Create a KeyPair
+
+1. Navigate to EC2 console
+2. Click **Key Pair** on the left
+3. Click **Create Key Pair**
+4. Save Keypair on desktop
+
+Create Jenkins Server
+
 1. Navigate to CloudFormation Console
 2. Click **Create Stack**
 3. Click **Specify an Amazon S3 template URL** and use `https://s3.amazonaws.com/proberts-public/jenkins_build.yaml`
-4. Fill in each value for the template and create the stack.
-5. You will receive the password to login to your jenkins host on your phone.
-6. Navigate to EC2 and find the instance name Jenkins public DNS
-7. Connect to the dns at port 8080
+4. Set **Stack Name**
+5. Set **SSHKey** to keypair from above
+6. Set **Subnet** to a public subnet
+7. Set **VPC** to a vpc that is part of that subnet
+9. Navigate to EC2 and find the instance name Jenkins public DNS
+10. Connect to the dns at port 8080
+11. SSH onto jenkins box to get the password
 
-Replace values in walk through with customer values
-* #{region} -> region you would like to create resources in
-* #{account-id} -> your account id
-* #{project-name} -> AWSCodeBuildProject name such as CodeBuildJekyllExample
 
-Assume customer has a working Jenkins server.
 ## Setup Github repo
 Create a new repository
 
@@ -117,7 +123,7 @@ https://#{region}.console.aws.amazon.com/codesuite/codebuild/project/new?region=
 5. Navigate to **Artifacts**
   1. Select **Amazon S3** as an artifact type
   2. Choose the bucket we created above: jekyll-example-artifacts-#{account-id}-#{region}
-  3. In the **Path** text box enter a **.**
+  3. In the **Name** text box enter a **.**
   4. Click Checkbox **Remove Artifact Encryption**
 6. Click **Create build Project**
 
